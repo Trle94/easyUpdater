@@ -8,5 +8,6 @@ namespace easyUpdater
 {
     public class Class1
     {
+
     }
 }

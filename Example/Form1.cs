@@ -2,20 +2,26 @@
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
+using easyUpdater.Core.Management;
+using easyUpdater.Interfaces;
+
 
 namespace Example
 {
-    public partial class Form1 : Form
+    public partial class Form1 : Form, IEUpdatable
     {
+        // private easyUpdater updater;
+        private UpdateManager _updateManager;
         public Form1()
         {
             InitializeComponent();
             label1.Text = ApplicationAssembly.GetName().Version.ToString();
+            _updateManager = new UpdateManager(this);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
-
+            await _updateManager.Updater.CheckForUpdate();
         }
 
         #region Conf Update

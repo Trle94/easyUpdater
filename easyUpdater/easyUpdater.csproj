@@ -30,8 +30,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -40,8 +46,41 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Common\EnumerableExt.cs" />
+    <Compile Include="Common\EnumTypes.cs" />
+    <Compile Include="Common\MethodResult.cs" />
+    <Compile Include="Common\Utilities.cs" />
+    <Compile Include="Common\VersionExt.cs" />
+    <Compile Include="Core\Handling\ParseHandler.cs" />
+    <Compile Include="Core\Handling\UpdateHandler.cs" />
+    <Compile Include="Core\Management\Main.UpdateManager.cs" />
+    <Compile Include="easyUpdater.cs" />
+    <Compile Include="easyUpdateXML.cs" />
+    <Compile Include="Hasher.cs" />
+    <Compile Include="Interfaces\IEUpdatable.cs" />
+    <Compile Include="Interfaces\IParsedFile.cs" />
+    <Compile Include="Interfaces\IParseInfo.cs" />
+    <Compile Include="Interfaces\IParser.cs" />
+    <Compile Include="Models\JsonFile.cs" />
+    <Compile Include="Models\ParsedFile.cs" />
+    <Compile Include="Models\ParseInfoObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\DownloadForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\DownloadForm.Designer.cs">
+      <DependentUpon>DownloadForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

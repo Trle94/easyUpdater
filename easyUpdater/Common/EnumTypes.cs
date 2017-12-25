@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace easyUpdater
+namespace easyUpdater.Common
 {
-    public class Class1
+    public enum ParseType
     {
-
+        Xml,
+        Json
     }
 }

@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace easyUpdater
 {
     /// <summary>
-    /// The type of hash to create
+    ///     The type of hash to create
     /// </summary>
     internal enum HashType
     {
@@ -19,12 +15,12 @@ namespace easyUpdater
     }
 
     /// <summary>
-    /// Class used to generate hash sums of files
+    ///     Class used to generate hash sums of files
     /// </summary>
     internal static class Hasher
     {
         /// <summary>
-        /// Generate a hash sum of a file
+        ///     Generate a hash sum of a file
         /// </summary>
         /// <param name="filePath">The file to hash</param>
         /// <param name="algo">The Type of hash</param>
@@ -45,15 +41,15 @@ namespace easyUpdater
         }
 
         /// <summary>
-        /// Converts byte[] to string
+        ///     Converts byte[] to string
         /// </summary>
         /// <param name="hash">The hash to convert</param>
         /// <returns>Hash as string</returns>
         private static string MakeHashString(byte[] hash)
         {
-            StringBuilder s = new StringBuilder();
+            var s = new StringBuilder();
 
-            foreach (byte b in hash)
+            foreach (var b in hash)
                 s.Append(b.ToString("x2").ToLower());
 
             return s.ToString();

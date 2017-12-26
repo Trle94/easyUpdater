@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using easyUpdater.Interfaces;
@@ -15,8 +10,6 @@ namespace easyUpdater.UI
 {
     internal partial class DownloadForm : Form
     {
-        private readonly IParseInfo _updateInfo;
-
         private int _filesDownloaded;
 
         /// <summary>
@@ -29,23 +22,17 @@ namespace easyUpdater.UI
         {
             InitializeComponent();
 
-            if (programIcon != null)
-            {
-                Icon = programIcon;
-            }
+            if (programIcon != null) Icon = programIcon;
 
 
-            _updateInfo = updateInfo;
+            UpdateInfo = updateInfo;
 
 
             // Download files
             DownloadFiles();
         }
 
-        public IParseInfo UpdateInfo
-        {
-            get { return _updateInfo; }
-        }
+        public IParseInfo UpdateInfo { get; }
 
         // Don't need?
         /// <summary>
@@ -58,8 +45,8 @@ namespace easyUpdater.UI
         private string FormatBytes(long bytes, int decimalPlaces, bool showByteType)
         {
             double newBytes = bytes;
-            string formatString = "{0";
-            string byteType = "B";
+            var formatString = "{0";
+            var byteType = "B";
 
             // Check if best size in KB
             if (newBytes > 1024 && newBytes < 1048576)
@@ -85,7 +72,7 @@ namespace easyUpdater.UI
                 formatString += ":0.";
 
             // Add decimals
-            for (int i = 0; i < decimalPlaces; i++)
+            for (var i = 0; i < decimalPlaces; i++)
                 formatString += "0";
 
             // Close placeholder
@@ -100,7 +87,7 @@ namespace easyUpdater.UI
 
         private async Task<bool> CheckHash(string file, string md5)
         {
-            bool result = false;
+            var result = false;
 
             await Task.Run(() =>
             {
@@ -114,9 +101,9 @@ namespace easyUpdater.UI
 
         private async void DownloadFiles()
         {
-            bool success = true;
+            var success = true;
 
-            foreach (var file in _updateInfo.Files)
+            foreach (var file in UpdateInfo.Files)
             {
                 // Create Progress object to relay progress
                 var progress = new Progress<int>();
@@ -128,11 +115,11 @@ namespace easyUpdater.UI
                 progressBar.Style = ProgressBarStyle.Continuous;
 
                 // Show how many files have been downloaded
-                lblProgress.Text = string.Format("Downloaded {0} of {1}", _filesDownloaded, _updateInfo.Files.Count);
+                lblProgress.Text = string.Format("Downloaded {0} of {1}", _filesDownloaded, UpdateInfo.Files.Count);
 
                 // Create a tempFileName and download the file
                 file.TempPath = Path.GetTempFileName();
-                bool downloadResult = await DownloadFile(file.Url.ToString(), file.TempPath, progress);
+                var downloadResult = await DownloadFile(file.Url.ToString(), file.TempPath, progress);
 
                 if (!downloadResult)
                 {
@@ -150,12 +137,12 @@ namespace easyUpdater.UI
                 progressBar.Style = ProgressBarStyle.Marquee;
 
                 // check hash of downloaded file
-                bool hashResult = await CheckHash(file.TempPath, file.Md5);
+                var hashResult = await CheckHash(file.TempPath, file.Md5);
 
                 // If Hash is incorrect, ask user if they want to continue or not (not recommended)
                 if (!hashResult)
                 {
-                    DialogResult dialogResult =
+                    var dialogResult =
                         MessageBox.Show(
                             "A file's hash sum did not match what was expected. Do you want to proceed? (NOT RECOMMENDED)",
                             "Do you want to proceed?", MessageBoxButtons.YesNo);
@@ -179,7 +166,7 @@ namespace easyUpdater.UI
         {
             try
             {
-                using (WebClient client = new WebClient())
+                using (var client = new WebClient())
                 {
                     client.DownloadProgressChanged += (s, e) => { progress?.Report(e.ProgressPercentage); };
 

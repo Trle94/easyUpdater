@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace easyUpdater.Interfaces
+﻿namespace easyUpdater.Interfaces
 {
-    interface IParser
+    internal interface IParser
     {
     }
 }

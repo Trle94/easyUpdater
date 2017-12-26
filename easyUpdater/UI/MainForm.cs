@@ -1,6 +1,6 @@
 ﻿using System;
-using easyUpdater.Interfaces;
 using System.Windows.Forms;
+using easyUpdater.Interfaces;
 
 namespace easyUpdater.UI
 {
@@ -35,8 +35,8 @@ namespace easyUpdater.UI
             // Fill in the UI
             Text = "Check for " + applicationInfo.ApplicationName + " updates...";
             label2.Text = string.Format("A new version is available:\nOld version: {0}\nNew version: {1}",
-                applicationInfo.ApplicationAssembly.GetName().Version.ToString(),
-                updateInfo.Version.ToString());
+                applicationInfo.ApplicationAssembly.GetName().Version,
+                updateInfo.Version);
             txtDescription.Text = updateInfo.Description;
         }
 

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace easyUpdater.Common
 {
@@ -10,10 +6,7 @@ namespace easyUpdater.Common
     {
         public static string CleanFileName(string fileName)
         {
-            foreach (char c in System.IO.Path.GetInvalidFileNameChars())
-            {
-                fileName = fileName.Replace(c, '_');
-            }
+            foreach (var c in Path.GetInvalidFileNameChars()) fileName = fileName.Replace(c, '_');
             return fileName;
         }
     }

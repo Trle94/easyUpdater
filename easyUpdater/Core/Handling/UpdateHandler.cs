@@ -1,26 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using easyUpdater.Common;
 using easyUpdater.Core.Management;
 using easyUpdater.Interfaces;
-using easyUpdater.Common;
 using easyUpdater.UI;
 
 namespace easyUpdater.Core.Handling
 {
     public class UpdateHandler
     {
-        private UpdateManager _manager;
-
         /// <summary>
         ///     Holds the program-to-update's info
         /// </summary>
         private IEUpdatable _applicationInfo;
+
+        private UpdateManager _manager;
 
         public UpdateHandler(UpdateManager manager, IEUpdatable appliationInfo = null)
         {
@@ -30,16 +27,16 @@ namespace easyUpdater.Core.Handling
 
         public async Task<MethodResult<IParseInfo>> CheckForUpdate()
         {
-            MethodResult<IParseInfo> result = new MethodResult<IParseInfo>();
+            var result = new MethodResult<IParseInfo>();
 
             // Check if exists
-            bool exists = await ParseHandler.ExistsOnServerAsync(_applicationInfo.UpdateFileLocation);
+            var exists = await ParseHandler.ExistsOnServerAsync(_applicationInfo.UpdateFileLocation);
 
             if (!exists)
             {
                 result.Success = false;
                 result.Error = false;
-                result.Message = string.Format("No update information was found!");
+                result.Message = "No update information was found!";
 
                 return result;
             }
@@ -52,30 +49,26 @@ namespace easyUpdater.Core.Handling
             {
                 result.Success = false;
                 result.Error = true;
-                result.Message = string.Format("You have the latest version!");
+                result.Message = "You have the latest version!";
 
                 return result;
             }
 
             result.Success = true;
             result.Error = false;
-            result.Message = string.Format("Successfully obtained update info!");
+            result.Message = "Successfully obtained update info!";
             result.Data = parseInfo;
 
             // Check if version is newer than application's version
             if (!parseInfo.Version.IsNewerThan(_applicationInfo.ApplicationAssembly.GetName().Version))
             {
                 // Not newer, so return result
-                result.Message = string.Format("You have the latest version!");
+                result.Message = "You have the latest version!";
                 return result;
             }
 
             // Newer than application version, so launch MainForm (ask about update)
-            if (AskAboutUpdate(parseInfo))
-            {
-                // Download the update
-                DownloadUpdate(parseInfo);
-            }
+            if (AskAboutUpdate(parseInfo)) DownloadUpdate(parseInfo);
 
             return result;
         }
@@ -93,17 +86,17 @@ namespace easyUpdater.Core.Handling
         private void DownloadUpdate(IParseInfo updateInfo)
         {
             // Show DownloadForm
-            DownloadForm form = new DownloadForm(updateInfo, _applicationInfo.ApplicationIcon);
-            DialogResult result = form.ShowDialog(_applicationInfo.Context);
+            var form = new DownloadForm(updateInfo, _applicationInfo.ApplicationIcon);
+            var result = form.ShowDialog(_applicationInfo.Context);
 
             // Download update
             if (result == DialogResult.OK)
             {
-                string updateFolderName = string.Format("{0}_update_{1}", _applicationInfo.ApplicationName,
+                var updateFolderName = string.Format("{0}_update_{1}", _applicationInfo.ApplicationName,
                     Utilities.CleanFileName(updateInfo.Version.ToString()));
 
-                string currentPath = _applicationInfo.ApplicationAssembly.Location;
-                string newFolderPath = Path.GetDirectoryName(currentPath);
+                var currentPath = _applicationInfo.ApplicationAssembly.Location;
+                var newFolderPath = Path.GetDirectoryName(currentPath);
                 // string newPath = Path.GetDirectoryName(currentPath) + "\\" + updateFolderName;
 
                 // Update
@@ -130,11 +123,12 @@ namespace easyUpdater.Core.Handling
         /// <param name="currentPath">The path of the current application</param>
         /// <param name="newFolderPath">The new path for the new file</param>
         /// <param name="launchArgs">The launch arguments</param>
-        private void UpdateApplication(IList<IParsedFile> files, string currentPath, string newFolderPath, string launchArgs)
+        private void UpdateApplication(IList<IParsedFile> files, string currentPath, string newFolderPath,
+            string launchArgs)
         {
             // string deleteArg = string.Format("/C choice /C Y /N /D Y /T 4 & Del /F /Q {0}", currentPath);
 
-            string deleteArg = "";
+            var deleteArg = "";
 
             // create delete arg
             foreach (var file in files)
@@ -149,29 +143,31 @@ namespace easyUpdater.Core.Handling
                 // & Start \"\" /D \"{3}\" \"{4}\" {5} ///// Executes file, should be called only on .exe i guess
 
                 // Create delete args
-                string delete = string.Format("/C choice /C Y /N /D Y /T 1 & Del /F /Q \"{0}\\{1}\" & ", newFolderPath, file.FileName);
+                var delete = string.Format("/C choice /C Y /N /D Y /T 1 & Del /F /Q \"{0}\\{1}\" & ", newFolderPath,
+                    file.FileName);
 
                 deleteArg += delete;
             }
 
-            string moveArg = string.Empty;
+            var moveArg = string.Empty;
 
             // create moveFile arg
             foreach (var file in files)
             {
-                string newPath = string.Format("{0}\\{1}", newFolderPath, file.FileName);
+                var newPath = string.Format("{0}\\{1}", newFolderPath, file.FileName);
 
-                string moveFileArg = string.Format("choice /C Y /N /D Y /T 2 & Move /Y \"{0}\" \"{1}\" & ", file.TempPath,
+                var moveFileArg = string.Format("choice /C Y /N /D Y /T 2 & Move /Y \"{0}\" \"{1}\" & ", file.TempPath,
                     newPath);
 
                 moveArg += moveFileArg;
             }
 
-            string executeArg = string.Format("Start \"\" /D \"{0}\" \"{1}\" {2}", Path.GetDirectoryName(_applicationInfo.ApplicationAssembly.Location),
+            var executeArg = string.Format("Start \"\" /D \"{0}\" \"{1}\" {2}",
+                Path.GetDirectoryName(_applicationInfo.ApplicationAssembly.Location),
                 _applicationInfo.ApplicationAssembly.Location, launchArgs);
 
-            string arg = deleteArg + moveArg + executeArg;
-            ProcessStartInfo info = new ProcessStartInfo
+            var arg = deleteArg + moveArg + executeArg;
+            var info = new ProcessStartInfo
             {
                 Arguments = arg,
                 WindowStyle = ProcessWindowStyle.Hidden,

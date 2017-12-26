@@ -54,8 +54,6 @@
     <Compile Include="Core\Handling\ParseHandler.cs" />
     <Compile Include="Core\Handling\UpdateHandler.cs" />
     <Compile Include="Core\Management\Main.UpdateManager.cs" />
-    <Compile Include="easyUpdater.cs" />
-    <Compile Include="easyUpdateXML.cs" />
     <Compile Include="Hasher.cs" />
     <Compile Include="Interfaces\IEUpdatable.cs" />
     <Compile Include="Interfaces\IParsedFile.cs" />

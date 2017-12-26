@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace easyUpdater.Common
+﻿namespace easyUpdater.Common
 {
     /// <summary>
     ///     An object to provide the result of a method or action

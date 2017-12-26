@@ -3,7 +3,7 @@ using easyUpdater.Interfaces;
 
 namespace easyUpdater.Core.Management
 {
-    public partial class UpdateManager
+    public class UpdateManager
     {
         public UpdateManager(IEUpdatable iEUpdatable = null)
         {

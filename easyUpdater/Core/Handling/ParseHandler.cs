@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using easyUpdater.Common;
 using easyUpdater.Core.Management;
 using easyUpdater.Interfaces;
-using easyUpdater.Common;
 using easyUpdater.Models;
 using Newtonsoft.Json;
 
@@ -16,14 +15,13 @@ namespace easyUpdater.Core.Handling
 {
     public class ParseHandler
     {
+        private static IParseInfo _parseInfo;
         private UpdateManager _manager;
 
         public ParseHandler(UpdateManager manager)
         {
             _manager = manager;
         }
-
-        private static IParseInfo _parseInfo;
 
 
         /// <summary>
@@ -36,10 +34,10 @@ namespace easyUpdater.Core.Handling
             try
             {
                 // Request the update.xml
-                HttpWebRequest req = (HttpWebRequest)WebRequest.Create(location.AbsoluteUri);
+                var req = (HttpWebRequest) WebRequest.Create(location.AbsoluteUri);
 
                 // Read for response
-                HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
+                var resp = (HttpWebResponse) req.GetResponse();
                 resp.Close();
 
                 return resp.StatusCode == HttpStatusCode.OK;
@@ -82,7 +80,7 @@ namespace easyUpdater.Core.Handling
             try
             {
                 // Get json object
-                string doc = await GetInfoDoc(location.AbsoluteUri);
+                var doc = await GetInfoDoc(location.AbsoluteUri);
                 ParseInfoObject parseInfo = null;
 
                 await Task.Run(() =>
@@ -90,25 +88,19 @@ namespace easyUpdater.Core.Handling
                     var updateJson = JsonConvert.DeserializeObject<RootObject>(doc);
                     var appUpdate = updateJson.eUpdate.update.FirstOrDefault(x => x.appID == appId);
 
-                    if (appUpdate == null)
-                    {
-                        return;
-                    }
+                    if (appUpdate == null) return;
 
                     // Parse data
                     // If Version is null, then we can't compare assembly versions for update
-                    string versionString = appUpdate.version;
-                    if (string.IsNullOrWhiteSpace(versionString))
-                    {
-                        return;
-                    }
+                    var versionString = appUpdate.version;
+                    if (string.IsNullOrWhiteSpace(versionString)) return;
 
-                    Version version = Version.Parse(versionString);
+                    var version = Version.Parse(versionString);
 
                     var fileList = new List<IParsedFile>();
                     foreach (var file in appUpdate.files.file)
                     {
-                        ParsedFile parsedFile = new ParsedFile
+                        var parsedFile = new ParsedFile
                         {
                             FileName = file.fileName,
                             Md5 = file.md5,
@@ -118,7 +110,7 @@ namespace easyUpdater.Core.Handling
                         fileList.Add(parsedFile);
                     }
 
-                    string description = appUpdate.description;
+                    var description = appUpdate.description;
 
                     parseInfo = new ParseInfoObject(version, fileList, description, null);
                 });
@@ -139,48 +131,36 @@ namespace easyUpdater.Core.Handling
                 await Task.Run(() =>
                 {
                     // Load the document
-                    XmlDocument doc = new XmlDocument();
+                    var doc = new XmlDocument();
                     doc.Load(location.AbsoluteUri);
 
                     // Gets the appId's node with the update info
                     // This allows you to store all program's update nodes in one file
-                    XmlNode updateNode = doc.DocumentElement?.SelectSingleNode("//update[@appID='" + appId + "']");
+                    var updateNode = doc.DocumentElement?.SelectSingleNode("//update[@appID='" + appId + "']");
 
                     // If the node doesn't exist, there is no update
-                    if (updateNode == null)
-                    {
-                        return;
-                    }
+                    if (updateNode == null) return;
 
                     // Parse data
                     // If Version is null, then we can't compare assembly versions for update
-                    string versionString = updateNode["version"]?.InnerText;
-                    if (string.IsNullOrWhiteSpace(versionString))
-                    {
-                        return;
-                    }
+                    var versionString = updateNode["version"]?.InnerText;
+                    if (string.IsNullOrWhiteSpace(versionString)) return;
 
-                    Version version = Version.Parse(versionString);
+                    var version = Version.Parse(versionString);
 
                     var files = updateNode["files"]?.ChildNodes;
-                    if (files == null)
-                    {
-                        return;
-                    }
+                    if (files == null) return;
 
                     var fileList = new List<IParsedFile>();
 
                     foreach (XmlNode file in files)
                     {
                         Uri uri = null;
-                        string url = file["url"]?.InnerText;
+                        var url = file["url"]?.InnerText;
 
-                        if (!string.IsNullOrEmpty(url))
-                        {
-                            uri = new Uri(url);
-                        }
+                        if (!string.IsNullOrEmpty(url)) uri = new Uri(url);
 
-                        ParsedFile parsedFile = new ParsedFile
+                        var parsedFile = new ParsedFile
                         {
                             FileName = file["fileName"]?.InnerText,
                             Md5 = file["md5"]?.InnerText,
@@ -190,9 +170,9 @@ namespace easyUpdater.Core.Handling
                         fileList.Add(parsedFile);
                     }
 
-                    string md5 = updateNode["md5"]?.InnerText;
-                    string description = updateNode["description"]?.InnerText;
-                    string launchArgs = updateNode["launchArgs"]?.InnerText;
+                    var md5 = updateNode["md5"]?.InnerText;
+                    var description = updateNode["description"]?.InnerText;
+                    var launchArgs = updateNode["launchArgs"]?.InnerText;
 
                     parseInfo = new ParseInfoObject(version, fileList, description, launchArgs);
                 });
@@ -208,10 +188,7 @@ namespace easyUpdater.Core.Handling
 
         private static async Task<string> GetInfoDoc(string url)
         {
-            if (string.IsNullOrEmpty(url))
-            {
-                return null;
-            }
+            if (string.IsNullOrEmpty(url)) return null;
 
             try
             {
@@ -231,10 +208,7 @@ namespace easyUpdater.Core.Handling
 
         private static ParseType GetDocType(string url)
         {
-            if (string.IsNullOrEmpty(url))
-            {
-                throw new Exception("Url cannot be null!");
-            }
+            if (string.IsNullOrEmpty(url)) throw new Exception("Url cannot be null!");
 
             var ext = Path.GetExtension(url);
 
@@ -253,7 +227,7 @@ namespace easyUpdater.Core.Handling
 
         public static async Task<bool> ExistsOnServerAsync(Uri location)
         {
-            bool result = false;
+            var result = false;
 
             await Task.Run(() => { result = ExistsOnServer(location); });
 
